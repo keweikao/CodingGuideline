@@ -1,0 +1,43 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id             String    @id @default(cuid())
+  email          String    @unique
+  hashedPassword String
+  createdAt      DateTime  @default(now())
+  challenges     Challenge[]
+}
+
+model Challenge {
+  id          String    @id @default(cuid())
+  userId      String
+  user        User      @relation(fields: [userId], references: [id])
+  startDate   DateTime  @default(now())
+  status      String    // "ongoing" or "completed"
+  currentDay  Int
+  activities  DailyActivity[]
+
+  @@index([userId])
+}
+
+model DailyActivity {
+  id           String    @id @default(cuid())
+  challengeId  String
+  challenge    Challenge @relation(fields: [challengeId], references: [id])
+  dayNumber    Int
+  description  String
+  isCompleted  Boolean   @default(false)
+  isCustom     Boolean   @default(false)
+
+  @@index([challengeId])
+}
