@@ -1,16 +1,18 @@
 // app/profile/page.tsx
+// app/profile/page.tsx
 'use client';
 
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/components/app/AuthProvider";
 import { useEffect, useState } from "react";
 import { useRouter } from 'next/navigation';
+import { ProtectedRoute } from "@/components/app/ProtectedRoute";
 
 interface UserProfile {
   email: string;
 }
 
-export default function ProfilePage() {
+function ProfilePageContent() {
   const { token, setToken } = useAuth();
   const router = useRouter();
   const [user, setUser] = useState<UserProfile | null>(null);
@@ -30,7 +32,7 @@ export default function ProfilePage() {
 
   const handleLogout = () => {
     setToken(null);
-    router.push('/'); // Redirect to home, which will show login prompt
+    router.push('/auth');
   };
 
   const handleRestart = async () => {
@@ -41,7 +43,6 @@ export default function ProfilePage() {
       method: 'POST',
       headers: { Authorization: `Bearer ${token}` },
     });
-    // Navigate to home to see the "Start Challenge" button again
     router.push('/');
   };
 
@@ -59,5 +60,13 @@ export default function ProfilePage() {
         <Button variant="outline" onClick={handleLogout}>Logout</Button>
       </div>
     </div>
+  );
+}
+
+export default function ProfilePage() {
+  return (
+    <ProtectedRoute>
+      <ProfilePageContent />
+    </ProtectedRoute>
   );
 }

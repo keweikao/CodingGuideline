@@ -1,8 +1,9 @@
 // app/api/auth/register/route.ts
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import bcrypt from 'bcryptjs';
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   try {
     const { email, password } = await request.json();
 
@@ -33,8 +34,9 @@ export async function POST(request: Request) {
 
     return NextResponse.json({ message: 'User created successfully', userId: user.id }, { status: 201 });
 
-  } catch (error) {
-    console.error('Registration error:', error);
+  } catch (error: any) {
+    // Enhanced logging to catch the specific error
+    console.error('[REGISTER_ERROR]', error);
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
 }

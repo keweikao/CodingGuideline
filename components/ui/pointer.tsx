@@ -10,7 +10,7 @@ import {
 
 import { cn } from "@/lib/utils"
 
-interface PointerProps extends Omit<HTMLMotionProps<"div">, "ref"> {}
+type PointerProps = {};
 
 /**
  * A custom pointer component that displays an animated cursor.

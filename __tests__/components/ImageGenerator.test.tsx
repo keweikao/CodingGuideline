@@ -79,7 +79,7 @@ describe('ImageGenerator', () => {
     await user.type(input, 'A beautiful sunset');
     await user.click(generateButton);
 
-    expect(screen.getByText(/generating/i)).toBeInTheDocument();
+    expect(screen.getByTestId('loading-state')).toBeInTheDocument();
     expect(generateButton).toBeDisabled();
   });
 
@@ -155,26 +155,28 @@ describe('ImageGenerator', () => {
     render(<ImageGenerator />);
 
     const container = screen.getByTestId('image-generator-container');
+    const inputContainer = screen.getByTestId('input-container');
 
-    // Check for responsive classes
     expect(container).toHaveClass('flex');
     expect(container).toHaveClass('flex-col');
-    expect(container).toHaveClass('sm:flex-row'); // Side-by-side on larger screens
+    expect(inputContainer).toHaveClass('sm:flex-row'); // Side-by-side on larger screens
   });
 
   it('should handle input validation for long prompts', async () => {
-    const user = userEvent.setup();
-    const longPrompt = 'A'.repeat(1001); // Exceeds limit
+    const longPrompt = 'A'.repeat(1001);
 
     render(<ImageGenerator />);
 
     const input = screen.getByPlaceholderText(/describe the image/i);
     const generateButton = screen.getByRole('button', { name: /generate/i });
 
-    await user.type(input, longPrompt);
+    // Use fireEvent.change to bypass the maxLength attribute of the input
+    fireEvent.change(input, { target: { value: longPrompt } });
 
-    expect(generateButton).toBeDisabled();
-    expect(screen.getByText(/prompt too long/i)).toBeInTheDocument();
+    await waitFor(() => {
+      expect(generateButton).toBeDisabled();
+      expect(screen.getByText(/Description must be 1000 characters or less/i)).toBeInTheDocument();
+    });
   });
 
   it('should clear error when new generation starts', async () => {

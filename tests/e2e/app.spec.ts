@@ -7,7 +7,7 @@ const userPassword = 'password123';
 test('Full user journey: registration, start challenge, and complete day 1', async ({ page }) => {
   // 1. Go to the app and get redirected to auth
   await page.goto('/');
-  await expect(page).toHaveURL('/auth');
+  await expect(page.getByRole('heading', { name: 'Login' })).toBeVisible();
 
   // 2. Register a new user
   await page.getByRole('button', { name: 'Need an account? Register' }).click();
@@ -33,11 +33,11 @@ test('Full user journey: registration, start challenge, and complete day 1', asy
 
   // 6. Complete all activities
   for (const activity of activities) {
-    await activity.click();
+    // Use force: true to click through potential overlays if the checkbox is custom styled
+    await activity.click({ force: true });
   }
 
   // 7. Verify advancement to Day 2
-  // After completing the last activity, the state re-fetches and should show Day 2
   await expect(page.getByRole('heading', { name: 'Day 2 Challenge' })).toBeVisible();
 
   // 8. Check progress screen

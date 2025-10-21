@@ -1,17 +1,19 @@
 // app/progress/page.tsx
+// app/progress/page.tsx
 'use client';
 
 import { JourneyMap } from "@/components/app/JourneyMap";
 import { useAuth } from "@/components/app/AuthProvider";
 import { useEffect, useState } from "react";
+import { ProtectedRoute } from "@/components/app/ProtectedRoute";
 
 interface ChallengeState {
   currentDay: number;
   status: 'ongoing' | 'completed';
 }
 
-export default function ProgressPage() {
-  const { token, isLoading } = useAuth();
+function ProgressPageContent() {
+  const { token } = useAuth();
   const [challenge, setChallenge] = useState<ChallengeState | null>(null);
 
   useEffect(() => {
@@ -33,8 +35,7 @@ export default function ProgressPage() {
     fetchChallengeState();
   }, [token]);
 
-  if (isLoading || !challenge) {
-    // You can add a more sophisticated skeleton loader here
+  if (!challenge) {
     return <div>Loading journey...</div>;
   }
 
@@ -43,5 +44,13 @@ export default function ProgressPage() {
       <h1 className="text-3xl font-bold tracking-tight text-center mb-8">Your Journey</h1>
       <JourneyMap currentDay={challenge.currentDay} challengeStatus={challenge.status} />
     </div>
+  );
+}
+
+export default function ProgressPage() {
+  return (
+    <ProtectedRoute>
+      <ProgressPageContent />
+    </ProtectedRoute>
   );
 }

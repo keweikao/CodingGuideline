@@ -1,10 +1,12 @@
 // app/(main)/page.tsx
 'use client';
 
+import { GrowthPartner } from "@/components/app/GrowthPartner";
+import { DailyActivityList, Activity } from "@/components/app/DailyActivityList";
 import { useAuth } from "@/components/app/AuthProvider";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { useRouter } from 'next/navigation';
+import { ProtectedRoute } from "@/components/app/ProtectedRoute";
 
 interface ChallengeState {
   currentDay: number;
@@ -12,9 +14,8 @@ interface ChallengeState {
   activities: Activity[];
 }
 
-export default function HomePage() {
-  const { token, isLoading } = useAuth();
-  const router = useRouter();
+function HomePageContent() {
+  const { token } = useAuth();
   const [challenge, setChallenge] = useState<ChallengeState | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -37,13 +38,10 @@ export default function HomePage() {
   };
 
   useEffect(() => {
-    if (!isLoading && !token) {
-      router.push('/auth');
-    }
     if (token) {
       fetchChallengeState();
     }
-  }, [token, isLoading, router]);
+  }, [token, fetchChallengeState]);
 
   const handleStartChallenge = async () => {
     if (!token) return;
@@ -53,20 +51,18 @@ export default function HomePage() {
         headers: { 'Authorization': `Bearer ${token}` },
       });
       if (!res.ok) throw new Error('Failed to start challenge');
-      fetchChallengeState(); // Refetch state after starting
+      fetchChallengeState();
     } catch (e: any) {
       setError(e.message);
     }
   };
-
   const handleToggleComplete = async (activityId: string, isCompleted: boolean) => {
-    // For simplicity, we only handle completion, not un-completion
     if (isCompleted) {
       await fetch(`/api/activities/${activityId}/complete`, {
         method: 'PATCH',
         headers: { 'Authorization': `Bearer ${token}` },
       });
-      fetchChallengeState(); // Refetch to get new state (e.g., next day)
+      fetchChallengeState();
     }
   };
 
@@ -83,10 +79,6 @@ export default function HomePage() {
     );
     fetchChallengeState();
   };
-
-  if (isLoading || !token) {
-    return <div>Loading...</div>; // Or a proper skeleton screen
-  }
 
   if (error) {
     return <div className="text-red-500">Error: {error}</div>;
@@ -126,5 +118,13 @@ export default function HomePage() {
         onUpdateDescription={handleUpdateDescription}
       />
     </div>
+  );
+}
+
+export default function HomePage() {
+  return (
+    <ProtectedRoute>
+      <HomePageContent />
+    </ProtectedRoute>
   );
 }

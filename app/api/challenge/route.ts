@@ -9,49 +9,54 @@ if (!JWT_SECRET) {
 }
 const secret = new TextEncoder().encode(JWT_SECRET);
 
-async function getUserIdFromToken(request: Request): Promise<string | null> {
-  const token = request.headers.get('authorization')?.split(' ')[1];
-  if (!token) return null;
+export async function POST(request: NextRequest) {
   try {
+    const token = request.headers.get('authorization')?.split(' ')[1];
+    if (!token) {
+      return NextResponse.json({ error: 'Authentication token required' }, { status: 401 });
+    }
     const { payload } = await jwtVerify(token, secret);
-    return payload.userId as string;
-  } catch (e) {
-    return null;
-  }
-}
+    const userId = payload.userId as string;
+    if (!userId) {
+      return NextResponse.json({ error: 'Invalid token payload' }, { status: 401 });
+    }
 
-export async function POST(request: Request) {
-  const userId = await getUserIdFromToken(request);
-  if (!userId) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
-
-  try {
     const newChallenge = await startNewChallenge(userId);
     return NextResponse.json(newChallenge, { status: 201 });
   } catch (error: any) {
     if (error.message.includes('already exists')) {
       return NextResponse.json({ error: error.message }, { status: 409 });
     }
+    if (error.name === 'JWTExpired' || error.name === 'JWSInvalid') {
+        return NextResponse.json({ error: 'Invalid or expired token' }, { status: 401 });
+    }
     console.error('Start challenge error:', error);
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
 }
 
-export async function GET(request: Request) {
-  const userId = await getUserIdFromToken(request);
-  if (!userId) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
-
+export async function GET(request: NextRequest) {
   try {
+    const token = request.headers.get('authorization')?.split(' ')[1];
+    if (!token) {
+      return NextResponse.json({ error: 'Authentication token required' }, { status: 401 });
+    }
+    const { payload } = await jwtVerify(token, secret);
+    const userId = payload.userId as string;
+    if (!userId) {
+      return NextResponse.json({ error: 'Invalid token payload' }, { status: 401 });
+    }
+
     const challengeState = await getChallengeState(userId);
     if (!challengeState) {
       return NextResponse.json({ error: 'No active challenge found' }, { status: 404 });
     }
     return NextResponse.json(challengeState);
-  } catch (error) {
+  } catch (error: any) {
     console.error('Get challenge state error:', error);
+    if (error.name === 'JWTExpired' || error.name === 'JWSInvalid') {
+        return NextResponse.json({ error: 'Invalid or expired token' }, { status: 401 });
+    }
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
 }

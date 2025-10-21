@@ -2,6 +2,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Image from 'next/image';
 
 // This component will receive props to determine its state
 interface GrowthPartnerProps {
@@ -10,7 +11,7 @@ interface GrowthPartnerProps {
   currentDay: number;
 }
 
-type PartnerState = 'IDLE' | 'ACTIVE' | 'HAPPY' | 'EVOLVING';
+type PartnerState = 'IDLE' | 'ACTIVE';
 
 export function GrowthPartner({ totalTasks, completedTasks, currentDay }: GrowthPartnerProps) {
   const [state, setState] = useState<PartnerState>('IDLE');
@@ -18,10 +19,8 @@ export function GrowthPartner({ totalTasks, completedTasks, currentDay }: Growth
   useEffect(() => {
     if (completedTasks === 0) {
       setState('IDLE');
-    } else if (completedTasks > 0 && completedTasks < totalTasks) {
+    } else {
       setState('ACTIVE');
-    } else if (completedTasks === totalTasks) {
-      setState('HAPPY');
     }
     // A more complex evolution logic could be added here based on currentDay
   }, [completedTasks, totalTasks, currentDay]);
@@ -29,13 +28,9 @@ export function GrowthPartner({ totalTasks, completedTasks, currentDay }: Growth
   const renderState = () => {
     switch (state) {
       case 'IDLE':
-        return <div className="w-40 h-40 bg-gray-300 rounded-full flex items-center justify-center">Idle Partner</div>;
+        return <Image src="/partner-idle.png" alt="Idle Growth Partner" width={160} height={160} />;
       case 'ACTIVE':
-        return <div className="w-40 h-40 bg-yellow-300 rounded-full flex items-center justify-center">Working on it!</div>;
-      case 'HAPPY':
-        return <div className="w-40 h-40 bg-green-300 rounded-full flex items-center justify-center">Day Complete!</div>;
-      case 'EVOLVING':
-        return <div className="w-40 h-40 bg-blue-300 rounded-full flex items-center justify-center">Evolving!</div>;
+        return <Image src="/partner-active.png" alt="Active Growth Partner" width={160} height={160} />;
       default:
         return null;
     }

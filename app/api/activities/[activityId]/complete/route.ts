@@ -9,33 +9,29 @@ if (!JWT_SECRET) {
 }
 const secret = new TextEncoder().encode(JWT_SECRET);
 
-async function getUserIdFromToken(request: NextRequest): Promise<string | null> {
-  const token = request.headers.get('authorization')?.split(' ')[1];
-  if (!token) return null;
+export async function PATCH(request: NextRequest) {
   try {
+    const token = request.headers.get('authorization')?.split(' ')[1];
+    if (!token) {
+      return NextResponse.json({ error: 'Authentication token required' }, { status: 401 });
+    }
     const { payload } = await jwtVerify(token, secret);
-    return payload.userId as string;
-  } catch (e) {
-    return null;
-  }
-}
+    const userId = payload.userId as string;
+    if (!userId) {
+      return NextResponse.json({ error: 'Invalid token payload' }, { status: 401 });
+    }
 
-export async function PATCH(
-  request: NextRequest,
-  { params }: { params: { activityId: string } }
-) {
-  const userId = await getUserIdFromToken(request);
-  if (!userId) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
+    const activityId = request.nextUrl.pathname.split('/').slice(-2, -1)[0];
 
-  try {
-    const updatedActivity = await completeActivity(userId, params.activityId);
+    const updatedActivity = await completeActivity(userId, activityId);
     return NextResponse.json(updatedActivity);
   } catch (error: any) {
     console.error('Complete activity error:', error);
     if (error.message.includes('not found')) {
       return NextResponse.json({ error: error.message }, { status: 404 });
+    }
+    if (error.name === 'JWTExpired' || error.name === 'JWSInvalid') {
+        return NextResponse.json({ error: 'Invalid or expired token' }, { status: 401 });
     }
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
