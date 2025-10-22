@@ -1,0 +1,53 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Challenge API",
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/api/challenge": {
+      "get": {
+        "summary": "Get the current challenge state for the logged-in user",
+        "security": [{"bearerAuth": []}],
+        "responses": {
+          "200": {
+            "description": "Current challenge state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "challengeId": {"type": "string"},
+                    "currentDay": {"type": "integer"},
+                    "status": {"type": "string"},
+                    "activities": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "dailyActivityId": {"type": "string"},
+                          "description": {"type": "string"},
+                          "isCompleted": {"type": "boolean"},
+                          "isCustom": {"type": "boolean"}
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {"description": "No active challenge found for this user."}
+        }
+      },
+      "post": {
+        "summary": "Start a new 21-day challenge",
+        "security": [{"bearerAuth": []}],
+        "responses": {
+          "201": {"description": "New challenge started successfully."},
+          "409": {"description": "An active challenge already exists for this user."}
+        }
+      }
+    }
+  }
+}

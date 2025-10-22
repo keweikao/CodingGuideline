@@ -50,3 +50,5 @@ next-env.d.ts
 .next/
 node_modules/
 
+# Prisma
+prisma/*.db

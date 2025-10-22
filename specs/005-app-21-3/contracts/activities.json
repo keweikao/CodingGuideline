@@ -1,0 +1,60 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Activities API",
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/api/activities/{dailyActivityId}/complete": {
+      "patch": {
+        "summary": "Mark an activity as complete",
+        "security": [{"bearerAuth": []}],
+        "parameters": [
+          {
+            "name": "dailyActivityId",
+            "in": "path",
+            "required": true,
+            "schema": {"type": "string"}
+          }
+        ],
+        "responses": {
+          "200": {"description": "Activity marked as complete."},
+          "403": {"description": "User does not have permission to update this activity."},
+          "404": {"description": "Activity not found."}
+        }
+      }
+    },
+    "/api/activities/{dailyActivityId}": {
+      "put": {
+        "summary": "Update the description of a custom activity",
+        "security": [{"bearerAuth": []}],
+        "parameters": [
+          {
+            "name": "dailyActivityId",
+            "in": "path",
+            "required": true,
+            "schema": {"type": "string"}
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "description": {"type": "string"}
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {"description": "Activity updated successfully."},
+          "403": {"description": "User does not have permission or activity is not custom."},
+          "404": {"description": "Activity not found."}
+        }
+      }
+    }
+  }
+}

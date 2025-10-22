@@ -4,8 +4,6 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { google } from '@ai-sdk/google';
-import { generateText } from 'ai';
-import { z } from 'zod';
 import {
   ImageGenerationRequestSchema,
   ImageGenerationResponseSchema
@@ -35,7 +33,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<ImageGene
         error: 'API_KEY_MISSING' as ImageGenerationError,
         message: 'Google AI API key is not configured',
         requestId,
-        generatedAt
+        generatedAt: generatedAt.toISOString()
       }, { status: 401 });
     }
 
@@ -47,7 +45,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<ImageGene
         error: 'INVALID_PROMPT' as ImageGenerationError,
         message: 'Invalid JSON in request body',
         requestId,
-        generatedAt
+        generatedAt: generatedAt.toISOString()
       }, { status: 400 });
     }
 
@@ -63,15 +61,12 @@ export async function POST(request: NextRequest): Promise<NextResponse<ImageGene
         error: 'INVALID_PROMPT' as ImageGenerationError,
         message: errorMessage,
         requestId,
-        generatedAt,
+        generatedAt: generatedAt.toISOString(),
         details: { validationErrors: validation.error.issues }
       }, { status: 400 });
     }
 
     const { prompt, model } = validation.data;
-
-    // Initialize Google AI model
-    const googleModel = google(model);
 
     // Create a demo placeholder image since Gemini image generation requires special handling
     // Note: For actual image generation, you would need to use Google's specialized image generation API
@@ -98,7 +93,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<ImageGene
       success: true,
       imageUrl: placeholderImageUrl,
       requestId,
-      generatedAt,
+      generatedAt: generatedAt.toISOString(),
       dimensions: { width: 512, height: 512 },
       prompt,
       model
@@ -144,7 +139,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<ImageGene
       error: errorType,
       message,
       requestId,
-      generatedAt,
+      generatedAt: generatedAt.toISOString(),
       details: {
         originalError: errorMessage,
         stack: process.env.NODE_ENV === 'development' && error instanceof Error ? error.stack : undefined
@@ -162,7 +157,7 @@ export async function GET() {
     error: 'INTERNAL_ERROR' as ImageGenerationError,
     message: 'Method not allowed. Use POST to generate images',
     requestId: crypto.randomUUID(),
-    generatedAt: new Date()
+    generatedAt: new Date().toISOString()
   }, { status: 405 });
 }
 
@@ -172,7 +167,7 @@ export async function PUT() {
     error: 'INTERNAL_ERROR' as ImageGenerationError,
     message: 'Method not allowed. Use POST to generate images',
     requestId: crypto.randomUUID(),
-    generatedAt: new Date()
+    generatedAt: new Date().toISOString()
   }, { status: 405 });
 }
 
@@ -182,6 +177,6 @@ export async function DELETE() {
     error: 'INTERNAL_ERROR' as ImageGenerationError,
     message: 'Method not allowed. Use POST to generate images',
     requestId: crypto.randomUUID(),
-    generatedAt: new Date()
+    generatedAt: new Date().toISOString()
   }, { status: 405 });
 }
