@@ -280,7 +280,7 @@ export const TweetCard = async ({
 
   return (
     <Suspense fallback={fallback}>
-      <MagicTweet tweet={tweet} {...props} />
+      <MagicTweet tweet={tweet} components={components} {...props} />
     </Suspense>
   )
 }

@@ -10,7 +10,7 @@ import {
 
 import { cn } from "@/lib/utils"
 
-type PointerProps = {};
+type PointerProps = React.HTMLAttributes<HTMLDivElement>;
 
 /**
  * A custom pointer component that displays an animated cursor.
