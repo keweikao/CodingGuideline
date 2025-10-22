@@ -30,9 +30,10 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
     return NextResponse.json(user);
-  } catch (error: any) {
-    console.error('Get user profile error:', error);
-    if (error.name === 'JWTExpired' || error.name === 'JWSInvalid') {
+  } catch (error) {
+    const err = error as Error & { name?: string };
+    console.error('Get user profile error:', err);
+    if (err.name === 'JWTExpired' || err.name === 'JWSInvalid') {
         return NextResponse.json({ error: 'Invalid or expired token' }, { status: 401 });
     }
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });

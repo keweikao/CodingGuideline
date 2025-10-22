@@ -23,9 +23,10 @@ export async function POST(request: NextRequest) {
 
     await restartChallenge(userId);
     return NextResponse.json({ message: 'Challenge restarted successfully' });
-  } catch (error: any) {
-    console.error('Restart challenge error:', error);
-    if (error.name === 'JWTExpired' || error.name === 'JWSInvalid') {
+  } catch (error) {
+    const err = error as Error & { name?: string };
+    console.error('Restart challenge error:', err);
+    if (err.name === 'JWTExpired' || err.name === 'JWSInvalid') {
         return NextResponse.json({ error: 'Invalid or expired token' }, { status: 401 });
     }
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });

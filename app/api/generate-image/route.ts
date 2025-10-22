@@ -4,8 +4,6 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { google } from '@ai-sdk/google';
-import { generateText } from 'ai';
-import { z } from 'zod';
 import {
   ImageGenerationRequestSchema,
   ImageGenerationResponseSchema
@@ -69,9 +67,6 @@ export async function POST(request: NextRequest): Promise<NextResponse<ImageGene
     }
 
     const { prompt, model } = validation.data;
-
-    // Initialize Google AI model
-    const googleModel = google(model);
 
     // Create a demo placeholder image since Gemini image generation requires special handling
     // Note: For actual image generation, you would need to use Google's specialized image generation API

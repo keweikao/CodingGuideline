@@ -4,7 +4,7 @@
 import { GrowthPartner } from "@/components/app/GrowthPartner";
 import { DailyActivityList, Activity } from "@/components/app/DailyActivityList";
 import { useAuth } from "@/components/app/AuthProvider";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { ProtectedRoute } from "@/components/app/ProtectedRoute";
 
@@ -19,7 +19,7 @@ function HomePageContent() {
   const [challenge, setChallenge] = useState<ChallengeState | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchChallengeState = async () => {
+  const fetchChallengeState = useCallback(async () => {
     if (!token) return;
     try {
       const res = await fetch('/api/challenge', {
@@ -32,10 +32,11 @@ function HomePageContent() {
       if (!res.ok) throw new Error('Failed to fetch challenge state');
       const data = await res.json();
       setChallenge(data);
-    } catch (e: any) {
-      setError(e.message);
+    } catch (e) {
+      const error = e as Error;
+      setError(error.message);
     }
-  };
+  }, [token]);
 
   useEffect(() => {
     if (token) {
@@ -52,8 +53,9 @@ function HomePageContent() {
       });
       if (!res.ok) throw new Error('Failed to start challenge');
       fetchChallengeState();
-    } catch (e: any) {
-      setError(e.message);
+    } catch (e) {
+      const error = e as Error;
+      setError(error.message);
     }
   };
   const handleToggleComplete = async (activityId: string, isCompleted: boolean) => {

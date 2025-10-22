@@ -3,7 +3,6 @@
 import { useEffect, useRef, useState } from "react"
 import {
   AnimatePresence,
-  HTMLMotionProps,
   motion,
   useMotionValue,
 } from "motion/react"

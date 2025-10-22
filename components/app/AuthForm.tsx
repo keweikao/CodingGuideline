@@ -44,8 +44,9 @@ export function AuthForm() {
         alert('Registration successful! Please log in.');
       }
 
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err) {
+      const error = err as Error;
+      setError(error.message);
     }
   };
 

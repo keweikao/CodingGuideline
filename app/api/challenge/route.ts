@@ -23,14 +23,15 @@ export async function POST(request: NextRequest) {
 
     const newChallenge = await startNewChallenge(userId);
     return NextResponse.json(newChallenge, { status: 201 });
-  } catch (error: any) {
-    if (error.message.includes('already exists')) {
-      return NextResponse.json({ error: error.message }, { status: 409 });
+  } catch (error) {
+    const err = error as Error & { name?: string };
+    if (err.message.includes('already exists')) {
+      return NextResponse.json({ error: err.message }, { status: 409 });
     }
-    if (error.name === 'JWTExpired' || error.name === 'JWSInvalid') {
+    if (err.name === 'JWTExpired' || err.name === 'JWSInvalid') {
         return NextResponse.json({ error: 'Invalid or expired token' }, { status: 401 });
     }
-    console.error('Start challenge error:', error);
+    console.error('Start challenge error:', err);
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
 }
@@ -52,9 +53,10 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'No active challenge found' }, { status: 404 });
     }
     return NextResponse.json(challengeState);
-  } catch (error: any) {
-    console.error('Get challenge state error:', error);
-    if (error.name === 'JWTExpired' || error.name === 'JWSInvalid') {
+  } catch (error) {
+    const err = error as Error & { name?: string };
+    console.error('Get challenge state error:', err);
+    if (err.name === 'JWTExpired' || err.name === 'JWSInvalid') {
         return NextResponse.json({ error: 'Invalid or expired token' }, { status: 401 });
     }
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });

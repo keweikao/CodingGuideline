@@ -25,12 +25,13 @@ export async function PATCH(request: NextRequest) {
 
     const updatedActivity = await completeActivity(userId, activityId);
     return NextResponse.json(updatedActivity);
-  } catch (error: any) {
-    console.error('Complete activity error:', error);
-    if (error.message.includes('not found')) {
-      return NextResponse.json({ error: error.message }, { status: 404 });
+  } catch (error) {
+    const err = error as Error & { name?: string };
+    console.error('Complete activity error:', err);
+    if (err.message.includes('not found')) {
+      return NextResponse.json({ error: err.message }, { status: 404 });
     }
-    if (error.name === 'JWTExpired' || error.name === 'JWSInvalid') {
+    if (err.name === 'JWTExpired' || err.name === 'JWSInvalid') {
         return NextResponse.json({ error: 'Invalid or expired token' }, { status: 401 });
     }
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });

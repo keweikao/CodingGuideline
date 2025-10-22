@@ -34,7 +34,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ message: 'User created successfully', userId: user.id }, { status: 201 });
 
-  } catch (error: any) {
+  } catch (error) {
     // Enhanced logging to catch the specific error
     console.error('[REGISTER_ERROR]', error);
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
