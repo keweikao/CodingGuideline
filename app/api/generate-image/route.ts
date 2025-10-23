@@ -3,7 +3,6 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { google } from '@ai-sdk/google';
 import {
   ImageGenerationRequestSchema,
   ImageGenerationResponseSchema

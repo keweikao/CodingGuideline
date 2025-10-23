@@ -56,7 +56,7 @@ export interface SuccessResponse {
   success: true;
   imageUrl: string;
   requestId: string;
-  generatedAt: Date;
+  generatedAt: string;
   dimensions: {
     width: number;
     height: number;
@@ -70,7 +70,7 @@ export interface ErrorResponse {
   error: ImageGenerationError;
   message: string;
   requestId: string;
-  generatedAt: Date;
+  generatedAt: string;
   details?: Record<string, unknown>;
 }
 

@@ -93,7 +93,6 @@ export function Pointer({
               scale: 0,
               opacity: 0,
             }}
-            {...props}
           >
             {children || (
               <svg

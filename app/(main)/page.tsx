@@ -30,7 +30,7 @@ function HomePageContent() {
         return;
       }
       if (!res.ok) throw new Error('Failed to fetch challenge state');
-      const data = await res.json();
+      const data = await res.json() as ChallengeState;
       setChallenge(data);
     } catch (e) {
       const error = e as Error;
