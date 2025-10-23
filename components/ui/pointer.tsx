@@ -23,7 +23,6 @@ export function Pointer({
   className,
   style,
   children,
-  ...props
 }: PointerProps): React.ReactNode {
   const x = useMotionValue(0)
   const y = useMotionValue(0)
